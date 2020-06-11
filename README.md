@@ -1,3 +1,5 @@
+## Requirements
+<code> pip install -r requirements.txt </code>
 ## Usage
 
 ### To use webcam stream (Default)
