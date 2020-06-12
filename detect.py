@@ -25,13 +25,12 @@ def detect_person(frame):
 
 
 	return frame
-
-#parser = argparse.ArgumentParser()
-#parser.add_argument('--path', help='0 for livestream, provide path otherwise - default is 0', default=0)
-#args = parser.parse_args()
+parser = argparse.ArgumentParser()
+parser.add_argument('--path', help='0 for livestream, provide path otherwise - default is 0', default=0)
+args = parser.parse_args()
 
 #path = 0 if args.path=='0' else args.path
-path = 'rtsp://admin:admin@192.168.0.100/1'
+#path = 'rtsp://admin:admin@192.168.0.100/1'
 cap = cv2.VideoCapture(path)
 
 cascade_full = cv2.CascadeClassifier('haarcascade_fullbody.xml')
