@@ -1,6 +1,7 @@
 import cv2
 import argparse
 import imutils
+import concurrent.futures
 
 def detect_person(frame):
 	im = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -25,27 +26,31 @@ def detect_person(frame):
 
 	return frame
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--path', help='0 for livestream, provide path otherwise - default is 0', default=0)
-args = parser.parse_args()
+#parser = argparse.ArgumentParser()
+#parser.add_argument('--path', help='0 for livestream, provide path otherwise - default is 0', default=0)
+#args = parser.parse_args()
 
-path = 0 if args.path=='0' else args.path
+#path = 0 if args.path=='0' else args.path
+path = 'rtsp://admin:admin@192.168.0.100/1'
 cap = cv2.VideoCapture(path)
 
 cascade_full = cv2.CascadeClassifier('haarcascade_fullbody.xml')
 cascade_upper = cv2.CascadeClassifier('haarcascade_upperbody.xml')
 cascade_side = cv2.CascadeClassifier('haarcascade_profileface.xml')
 
+with concurrent.futures.ThreadPoolExecutor() as executor:
+	while True:
+		future = executor.submit(cap.read)
 
-while True:
-	ret, frame = cap.read()
-	if ret:
-		det_frame = detect_person(frame)
-		cv2.imshow('Footage', det_frame)
-		if cv2.waitKey(10) & 0xFF == ord('q'):
+		ret, frame = future.result()
+		if ret:
+			#det_frame = detect_person(frame)
+			future2 = executor.submit(detect_person, frame)
+			cv2.imshow('Footage', future2.result())
+			if cv2.waitKey(10) & 0xFF == ord('q'):
+				break
+		else:
 			break
-	else:
-		break
 
 cap.release()
 cv2.destroyAllWindows()
