@@ -9,6 +9,7 @@ import argparse
 import imutils
 import time
 import cv2
+import threading
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -26,20 +27,25 @@ def detect_person(frame):
 	im = cv2.equalizeHist(im)
 	
 	# To Detect Side Faces
-	faces = cascade_side.detectMultiScale(im, 1.3)
-	for (x,y,w,h) in faces:
-		cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,255), 2)
+	#faces = cascade_side.detectMultiScale(im, 1.3)
+	faces = threading.Thread(target=cascade_side.detectMultiScale, args=(im,1.3,), daemon=True)
+# x = threading.Thread(target=thread_function, args=(1,), daemon=True)
+	#for (x,y,w,h) in faces:
+	#	cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,255), 2)
 	
 	# Full Body Detection
-	full_people = cascade_full.detectMultiScale(im, 1.3)
+	# full_people = cascade_full.detectMultiScale(im, 1.3)
+	full_people = threading.Thread(target=cascade_full.detectMultiScale, args=(im,1.3,), daemon=True)
 	
-	for (x,y,w,h) in full_people:
-		cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,255), 2)
+	#for (x,y,w,h) in full_people:
+	#	cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,255), 2)
 	
 	# Upper Body Detection
-	half_people = cascade_upper.detectMultiScale(im, 1.3)
-	for (x,y,w,h) in half_people:
-		cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,255), 2)
+	# half_people = cascade_upper.detectMultiScale(im, 1.3)
+	half_people = threading.Thread(target=cascade_upper.detectMultiScale, args=(im,1.3,), daemon=True)
+
+	#for (x,y,w,h) in half_people:
+	#	cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,255), 2)
 
 
 	return frame
@@ -58,9 +64,8 @@ while fvs.more():
 	# grab the frame from the threaded video file stream, resize
 	# it, and convert it to grayscale (while still retaining 3
 	# channels)
-	frame = fvs.read()
-    
-    frame = detect_person(frame) 
+	frame = detect_person(fvs.read())
+    # frame = detect_person(frame)
 
 	#frame = imutils.resize(frame, width=450)
 	frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
